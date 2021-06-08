@@ -7,8 +7,8 @@ import java.io.IOException;
 
 
 public class Fichier {
-	long osize;
-	long msize;
+	float osize;
+	float msize;
 	
 	String txt;
 	String nom;
@@ -103,29 +103,28 @@ public class Fichier {
 	// Fonction qui ecrit dans le fichier Freq.txt, le nombre de caractère, chaque caractère ainsi que son nombre d'apparition.
 	public void write_txt() {
 		try {
-			   File file = new File("Textes\\Freq.txt");
+			String nom = this.nom.substring(0, this.nom.length()-4);
+			File file = new File("Textes\\Freq_"+nom+".txt");
 
-			   // créer le fichier s'il n'existe pas
-			   if (!file.exists()) {
-			    file.createNewFile();
-			   }
-			   FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			   BufferedWriter bw = new BufferedWriter(fw);
-			   System.out.println(this.txt.length());
-			   bw.write(Integer.toString(this.txt.length()));
+			// créer le fichier s'il n'existe pas
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(Integer.toString(this.txt.length()));
 			   
-			   for (int i = 0; i < this.listNode.size(); i++) {
-				   bw.newLine();
-				   String carac = Character.toString(this.listNode.get(i).getCarac());
-				   String freq = Integer.toString(this.listNode.get(i).getFrequence());
-				   System.out.println(carac + "   " + freq);
-				   String ligne = carac + " " + freq;
-				   bw.write(ligne);
-			   }
-			   bw.close();
+			for (int i = 0; i < this.listNode.size(); i++) {
+				bw.newLine();
+				String carac = Character.toString(this.listNode.get(i).getCarac());
+				String freq = Integer.toString(this.listNode.get(i).getFrequence());
+				String ligne = carac + " " + freq;
+				bw.write(ligne);
+			}
+			bw.close();
 		} 
 		catch (IOException e) {
-			   e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	
@@ -194,26 +193,40 @@ public class Fichier {
 	// Fonction écrivant le code binaire dans le fichier CodeBin présent dans le dossier Textes
 	public void write_bin() {
 		try {
-			   File file = new File("Textes\\CodeBin_.bin");
-
-			   // créer le fichier s'il n'existe pas
-			   if (!file.exists()) {
-			    file.createNewFile();
-			   }
-			   FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			   BufferedWriter bw = new BufferedWriter(fw);
-			   bw.write(this.CodeBin);
-			   bw.close();
-			   this.msize = file.length();
+			String nom = this.nom.substring(0, this.nom.length()-4);
+			
+			FileOutputStream fos = new FileOutputStream(new File("Textes\\CodeBin_" + nom + ".bin"));
+		    BufferedOutputStream writer = new BufferedOutputStream(fos);
+		    			
+			while (this.CodeBin.length() % 8 != 0) {
+				this.CodeBin += "0";
+			}
+			
+			for(int i = 0; i < this.CodeBin.length()-2; i = i + 8) {
+				String part = this.CodeBin.substring(i, i+8);
+				int code = 0;
+				for(int j = 0; j<part.length(); j+=1) {
+					if (part.charAt(j) == '1'){
+						code += Math.pow(2, 7-j);
+					}
+				}
+				writer.write(code);
+				writer.flush();
+			}			
+			writer.close();
+			File myObj = new File("Textes\\CodeBin_" + nom + ".bin");
+			this.msize = myObj.length();
+			
+			
 		} 
 		catch (IOException e) {
-			   e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	
 	// Calcul du taux de compression à l'aide de la fonction donnée dans le sujet
 	public void taux() {
-		long taux = 1 - (this.msize/this.osize);
+		float taux = 1 - (this.msize/this.osize);
 		System.out.println("Le taux de compression est de " + taux + ".Soit " + taux*100 + "%.");
 	}
 	
@@ -226,7 +239,7 @@ public class Fichier {
 		this.profondeur(this.creationArbre(), ""); /*Code binaire de base vide -> ""*/
 		this.binary();
 		this.write_bin();
-		System.out.println("Le code binaire est disponible dans le fichier 'CodeBin_.bin', dans le dossier Textes.\n");
+		System.out.println("Le code binaire est disponible dans le dossier Textes.\n");
 		this.taux();
 	}
 
