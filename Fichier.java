@@ -7,26 +7,26 @@ import java.io.IOException;
 
 
 public class Fichier {
-	float osize;
-	float msize;
+	float osize; //Taille fichier original
+	float msize; //Taille fichier compressé
 	
-	String txt;
-	String nom;
-	String CodeBin = "";
+	String txt;	//Texte dans le fichier
+	String nom;	//Nom du fichier
+	String CodeBin = "";	//Code binaire
 		
 	TreeSet<Tuple> tuples = new TreeSet<Tuple>();
 	
-	ArrayList<Character> alphabet = new ArrayList<Character>();
-	ArrayList<Integer> frequence = new ArrayList<Integer>();
-	ArrayList<Node> listNode = new ArrayList<Node>();
+	ArrayList<Character> alphabet = new ArrayList<Character>();	//Liste de tous les caractères
+	ArrayList<Integer> frequence = new ArrayList<Integer>();	//Liste de toutes les fréquences
+	ArrayList<Node> listNode = new ArrayList<Node>();	//Liste de tous les noeuds
 	
-	HashMap<Character, String> dico = new HashMap<Character, String >();
-	
+	HashMap<Character, String> dico = new HashMap<Character, String >(); //Dictionnaire contenant chaque caractère associé à son code binaire.
 	
 	public Fichier(String fichier) {
 		this.nom = fichier;
 		this.txt = this.open("Textes\\" + fichier);
 	}
+	
 	/*
 	 * Ouvre et lis le fichier, ajoute tous les caractères dans texte
 	 */
@@ -104,7 +104,7 @@ public class Fichier {
 	public void write_txt() {
 		try {
 			String nom = this.nom.substring(0, this.nom.length()-4);
-			File file = new File("Textes\\Freq_"+nom+".txt");
+			File file = new File("Textes\\Fichier Frequence\\Freq_"+nom+".txt");
 
 			// créer le fichier s'il n'existe pas
 			if (!file.exists()) {
@@ -195,7 +195,7 @@ public class Fichier {
 		try {
 			String nom = this.nom.substring(0, this.nom.length()-4);
 			
-			FileOutputStream fos = new FileOutputStream(new File("Textes\\CodeBin_" + nom + ".bin"));
+			FileOutputStream fos = new FileOutputStream(new File("Textes\\Fichier Binaire\\CodeBin_" + nom + ".bin"));
 		    BufferedOutputStream writer = new BufferedOutputStream(fos);
 		    			
 			while (this.CodeBin.length() % 8 != 0) {
@@ -214,9 +214,9 @@ public class Fichier {
 				writer.flush();
 			}			
 			writer.close();
-			File myObj = new File("Textes\\CodeBin_" + nom + ".bin");
+			File myObj = new File("Textes\\Fichier Binaire\\CodeBin_" + nom + ".bin");
 			this.msize = myObj.length();
-			
+			System.out.println("Le code binaire est disponible dans le dossier Textes.\n");
 			
 		} 
 		catch (IOException e) {
@@ -230,6 +230,16 @@ public class Fichier {
 		System.out.println("Le taux de compression est de " + taux + ".Soit " + taux*100 + "%.");
 	}
 	
+	public void taille_moy() {
+		float count = 0;
+		for (char i : this.alphabet) {
+			String code = this.dico.get(i);
+			count += code.length();
+		}
+		float moy = (count / this.alphabet.size());
+		System.out.println("Le nombre moyen de bits par caracère est de : " + moy);
+	}
+	
 	// fonction faisant appel à chaque fonction dans l'ordre afin de traiter la compression
 	public void operation() {
 		this.lecture();
@@ -239,8 +249,8 @@ public class Fichier {
 		this.profondeur(this.creationArbre(), ""); /*Code binaire de base vide -> ""*/
 		this.binary();
 		this.write_bin();
-		System.out.println("Le code binaire est disponible dans le dossier Textes.\n");
 		this.taux();
+		this.taille_moy();
 	}
 
 }

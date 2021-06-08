@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.TreeSet;
-
 public class Tuple implements Comparable<Object>{
 	
 	char caractere;
@@ -9,7 +6,6 @@ public class Tuple implements Comparable<Object>{
 	public Tuple (Integer f, char c) {
 		this.caractere = c;
 		this.frequence = f;
-		
 	}
 	
 
